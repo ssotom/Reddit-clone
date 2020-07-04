@@ -1,0 +1,87 @@
+package ssotom.clone.reddit.demo.service;
+
+import lombok.AllArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import ssotom.clone.reddit.demo.model.User;
+import ssotom.clone.reddit.demo.model.VerificationToken;
+import ssotom.clone.reddit.demo.repository.UserRepository;
+import ssotom.clone.reddit.demo.repository.VerificationTokenRepository;
+import ssotom.clone.reddit.demo.exception.SpringRedditException;
+import ssotom.clone.reddit.demo.request.SingUpRequest;
+
+import javax.transaction.Transactional;
+import java.time.Instant;
+import java.util.Optional;
+import java.util.UUID;
+
+@AllArgsConstructor
+@Service
+public class AuthService {
+
+    private final static String EMAIL_ACTIVATION_URL = "http://localhost:8080/api/auth/account_verification";
+    private final static String EMAIL_ACTIVATION_SUBJECT = "Please Activate your account";
+    private final static String EMAIL_ACTIVATION_MESSAGE = "Thank you for signing up to Spring Reddit Clone, " +
+            "please click on the below url to activate your account : " + EMAIL_ACTIVATION_URL + "/";
+
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final VerificationTokenRepository verificationTokenRepository;
+    private final MailService mailService;
+
+    public boolean existsByEmail(String email) {
+        return userRepository.existsByEmail(email);
+    }
+
+    public boolean existsByUsername(String username) {
+        return userRepository.existsByUsername(username);
+    }
+
+    @Transactional
+    public void signup(SingUpRequest singUpRequest) {
+        User user = new User();
+        user.setUsername(singUpRequest.getUsername());
+        user.setEmail(singUpRequest.getEmail());
+        user.setPassword(
+                passwordEncoder.encode(singUpRequest.getPassword())
+        );
+        user.setCreatedAt(Instant.now());
+        user.setEnabled(false);
+        userRepository.save(user);
+
+        String token = generateVerificationToken(user);
+        String message =  generateEmailActivationMessage(token);
+        mailService.sendMail(user.getEmail(), EMAIL_ACTIVATION_SUBJECT, message);
+    }
+
+    public void verifyAccount(String token) {
+        Optional<VerificationToken> verificationToken = verificationTokenRepository.findByToken(token);
+        verificationToken.orElseThrow(() -> new SpringRedditException("Invalid Token: " + token));
+        fetchUserAndEnable(verificationToken.get());
+    }
+
+    private String generateVerificationToken(User user) {
+        String token = UUID.randomUUID().toString();
+
+        VerificationToken verificationToken = new VerificationToken();
+        verificationToken.setToken(token);
+        verificationToken.setUser(user);
+
+        verificationTokenRepository.save(verificationToken);
+        return token;
+    }
+
+    private String generateEmailActivationMessage(String token) {
+        return EMAIL_ACTIVATION_MESSAGE + token;
+    }
+
+    @Transactional
+    private void fetchUserAndEnable(VerificationToken verificationToken) {
+        User user = verificationToken.getUser();
+        user.setEnabled(true);
+        userRepository.save(user);
+
+        verificationTokenRepository.delete(verificationToken);
+    }
+
+}
