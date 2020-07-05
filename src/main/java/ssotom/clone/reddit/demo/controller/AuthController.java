@@ -4,11 +4,15 @@ import lombok.AllArgsConstructor;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import ssotom.clone.reddit.demo.exception.SpringRedditException;
+import ssotom.clone.reddit.demo.request.LoginRequest;
 import ssotom.clone.reddit.demo.request.SingUpRequest;
+import ssotom.clone.reddit.demo.response.AuthenticationResponse;
 import ssotom.clone.reddit.demo.response.ErrorResponse;
 import ssotom.clone.reddit.demo.response.MessageResponse;
 import ssotom.clone.reddit.demo.service.AuthService;
@@ -33,6 +37,21 @@ public class AuthController {
             return new ResponseEntity<>(new MessageResponse("Account created successfully"), HttpStatus.CREATED);
         } catch (DataAccessException e) {
             return ErrorResponse.returnInternalServerError(e.getMostSpecificCause().getLocalizedMessage());
+        }
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest loginRequest, BindingResult result) {
+        if(result.hasErrors()) {
+            return ErrorResponse.returnError(result);
+        }
+        try {
+            AuthenticationResponse authenticationResponse = authService.login(loginRequest);
+            return new ResponseEntity<>(authenticationResponse, HttpStatus.OK);
+        } catch (BadCredentialsException e) {
+            return ErrorResponse.returnError(HttpStatus.BAD_REQUEST, "Bad Credentials");
+        } catch(DisabledException e) {
+            return ErrorResponse.returnError(HttpStatus.BAD_REQUEST, "Disabled Account");
         }
     }
 

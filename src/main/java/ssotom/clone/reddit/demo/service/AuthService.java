@@ -1,6 +1,10 @@
 package ssotom.clone.reddit.demo.service;
 
 import lombok.AllArgsConstructor;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ssotom.clone.reddit.demo.model.User;
@@ -8,7 +12,10 @@ import ssotom.clone.reddit.demo.model.VerificationToken;
 import ssotom.clone.reddit.demo.repository.UserRepository;
 import ssotom.clone.reddit.demo.repository.VerificationTokenRepository;
 import ssotom.clone.reddit.demo.exception.SpringRedditException;
+import ssotom.clone.reddit.demo.request.LoginRequest;
 import ssotom.clone.reddit.demo.request.SingUpRequest;
+import ssotom.clone.reddit.demo.response.AuthenticationResponse;
+import ssotom.clone.reddit.demo.security.JwtProvider;
 
 import javax.transaction.Transactional;
 import java.time.Instant;
@@ -28,6 +35,8 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final VerificationTokenRepository verificationTokenRepository;
     private final MailService mailService;
+    private final AuthenticationManager authenticationManager;
+    private final JwtProvider jwtProvider;
 
     public boolean existsByEmail(String email) {
         return userRepository.existsByEmail(email);
@@ -84,4 +93,12 @@ public class AuthService {
         verificationTokenRepository.delete(verificationToken);
     }
 
+    public AuthenticationResponse login(LoginRequest loginRequest) {
+        Authentication authenticate = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+                loginRequest.getUsername(), loginRequest.getPassword()
+        ));
+        SecurityContextHolder.getContext().setAuthentication(authenticate);
+        String token = jwtProvider.generateToken(authenticate);
+        return new AuthenticationResponse(token, loginRequest.getUsername());
+    }
 }

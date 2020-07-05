@@ -38,6 +38,6 @@ public class User {
 
     private Instant createdAt;
 
-    private Boolean enabled;
+    private boolean enabled;
 
 }
