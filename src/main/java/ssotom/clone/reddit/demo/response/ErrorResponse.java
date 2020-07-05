@@ -7,13 +7,13 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
 @Data
 public class ErrorResponse {
-    private HttpStatus status;
+    private int status;
+    private String error;
     private String message;
     private List<String> errors;
 
@@ -26,23 +26,21 @@ public class ErrorResponse {
                 errors), HttpStatus.BAD_REQUEST);
     }
 
-    public static ResponseEntity<?> returnError(HttpStatus httpStatus, String message) {
+    public static ResponseEntity<?> returnError(String message, HttpStatus httpStatus) {
         return new ResponseEntity<>(new ErrorResponse(httpStatus, "Fatal error", message), httpStatus);
     }
 
-    public static ResponseEntity<?> returnInternalServerError(String message) {
-        return new ResponseEntity<>(new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Fatal error", message), HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
     public ErrorResponse(HttpStatus status, String message, List<String> errors) {
-        this.status = status;
+        this.status = status.value();
         this.message = message;
+        this.error = status.name();
         this.errors = errors;
     }
 
     public ErrorResponse(HttpStatus status, String message, String error) {
-        this.status = status;
+        this.status = status.value();
         this.message = message;
+        this.error = status.name();
         errors = Arrays.asList(error);
     }
 

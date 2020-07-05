@@ -9,7 +9,7 @@ import org.springframework.security.authentication.DisabledException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
-import ssotom.clone.reddit.demo.exception.SpringRedditException;
+import ssotom.clone.reddit.demo.exception.NotFoundException;
 import ssotom.clone.reddit.demo.request.LoginRequest;
 import ssotom.clone.reddit.demo.request.SingUpRequest;
 import ssotom.clone.reddit.demo.response.AuthenticationResponse;
@@ -36,7 +36,7 @@ public class AuthController {
             authService.signup(singUpRequest);
             return new ResponseEntity<>(new MessageResponse("Account created successfully"), HttpStatus.CREATED);
         } catch (DataAccessException e) {
-            return ErrorResponse.returnInternalServerError(e.getMostSpecificCause().getLocalizedMessage());
+            return ErrorResponse.returnError(e.getMostSpecificCause().getLocalizedMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -49,9 +49,9 @@ public class AuthController {
             AuthenticationResponse authenticationResponse = authService.login(loginRequest);
             return new ResponseEntity<>(authenticationResponse, HttpStatus.OK);
         } catch (BadCredentialsException e) {
-            return ErrorResponse.returnError(HttpStatus.BAD_REQUEST, "Bad Credentials");
+            return ErrorResponse.returnError("Bad Credentials", HttpStatus.BAD_REQUEST);
         } catch(DisabledException e) {
-            return ErrorResponse.returnError(HttpStatus.BAD_REQUEST, "Disabled Account");
+            return ErrorResponse.returnError("Disabled Account", HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -60,8 +60,8 @@ public class AuthController {
         try {
             authService.verifyAccount(token);
             return new ResponseEntity<>(new MessageResponse("Account activated successfully"), HttpStatus.OK);
-        } catch (SpringRedditException e) {
-            return ErrorResponse.returnError(HttpStatus.NOT_FOUND, e.getMessage());
+        } catch (NotFoundException e) {
+            return ErrorResponse.returnError(e.getMessage(), HttpStatus.NOT_FOUND);
         }
     }
 

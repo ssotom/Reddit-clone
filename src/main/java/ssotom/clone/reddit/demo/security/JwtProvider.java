@@ -1,7 +1,11 @@
 package ssotom.clone.reddit.demo.security;
 
-import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.UnsupportedJwtException;
+import io.jsonwebtoken.security.SignatureException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.security.core.userdetails.User;
@@ -12,11 +16,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.*;
 import java.security.cert.CertificateException;
+import java.util.Date;
 
+@Slf4j
 @Service
 public class JwtProvider {
 
     private KeyStore keyStore;
+    private final static int JWT_EXPIRATION = 86400; //Seconds
 
     @PostConstruct
     public void init() {
@@ -33,26 +40,41 @@ public class JwtProvider {
         User principal = (User) authentication.getPrincipal();
         return Jwts.builder()
                 .setSubject(principal.getUsername())
+                .setIssuedAt(new Date())
+                .setExpiration(new Date((new Date()).getTime() + JWT_EXPIRATION * 1000))
                 .signWith(getPrivateKey())
                 .compact();
     }
 
     public boolean validateToken(String jwt) {
-        Jwts.parserBuilder()
-                .setSigningKey(getPublicKey())
-                .build()
-                .parseClaimsJws(jwt);
-        return true;
+        try {
+            Jwts.parserBuilder()
+                    .setSigningKey(getPublicKey())
+                    .build()
+                    .parseClaimsJws(jwt);
+            return true;
+        } catch (SignatureException e) {
+            log.error("Invalid JWT signature -> Message: {} ", e);
+        } catch (MalformedJwtException e) {
+            log.error("Invalid JWT token -> Message: {}", e);
+        } catch (ExpiredJwtException e) {
+            log.error("Expired JWT token -> Message: {}", e);
+        } catch (UnsupportedJwtException e) {
+            log.error("Unsupported JWT token -> Message: {}", e);
+        } catch (IllegalArgumentException e) {
+            log.error("JWT claims string is empty -> Message: {}", e);
+        }
+
+        return false;
     }
 
     public String getUsernameFromJWT(String token) {
-        Claims claims = Jwts.parserBuilder()
+        return Jwts.parserBuilder()
                 .setSigningKey(getPublicKey())
                 .build()
                 .parseClaimsJws(token)
-                .getBody();
-
-        return claims.getSubject();
+                .getBody()
+                .getSubject();
     }
 
     private PrivateKey getPrivateKey() {

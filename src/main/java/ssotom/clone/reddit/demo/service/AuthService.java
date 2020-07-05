@@ -8,11 +8,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import ssotom.clone.reddit.demo.exception.NotFoundException;
 import ssotom.clone.reddit.demo.model.User;
 import ssotom.clone.reddit.demo.model.VerificationToken;
 import ssotom.clone.reddit.demo.repository.UserRepository;
 import ssotom.clone.reddit.demo.repository.VerificationTokenRepository;
-import ssotom.clone.reddit.demo.exception.SpringRedditException;
 import ssotom.clone.reddit.demo.request.LoginRequest;
 import ssotom.clone.reddit.demo.request.SingUpRequest;
 import ssotom.clone.reddit.demo.response.AuthenticationResponse;
@@ -66,7 +66,7 @@ public class AuthService {
 
     public void verifyAccount(String token) {
         Optional<VerificationToken> verificationToken = verificationTokenRepository.findByToken(token);
-        verificationToken.orElseThrow(() -> new SpringRedditException("Invalid Token: " + token));
+        verificationToken.orElseThrow(() -> new NotFoundException("Invalid Token: " + token));
         fetchUserAndEnable(verificationToken.get());
     }
 
