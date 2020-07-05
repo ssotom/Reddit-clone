@@ -5,6 +5,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ssotom.clone.reddit.demo.model.User;
@@ -48,14 +49,14 @@ public class AuthService {
 
     @Transactional
     public void signup(SingUpRequest singUpRequest) {
-        User user = new User();
-        user.setUsername(singUpRequest.getUsername());
-        user.setEmail(singUpRequest.getEmail());
-        user.setPassword(
-                passwordEncoder.encode(singUpRequest.getPassword())
-        );
-        user.setCreatedAt(Instant.now());
-        user.setEnabled(false);
+
+        User user = User.builder()
+                .username(singUpRequest.getUsername())
+                .email(singUpRequest.getEmail())
+                .password(passwordEncoder.encode(singUpRequest.getPassword()))
+                .createdAt(Instant.now())
+                .enabled(false)
+                .build();
         userRepository.save(user);
 
         String token = generateVerificationToken(user);
@@ -101,4 +102,12 @@ public class AuthService {
         String token = jwtProvider.generateToken(authenticate);
         return new AuthenticationResponse(token, loginRequest.getUsername());
     }
+
+    public User getCurrentUser() {
+        org.springframework.security.core.userdetails.User principal = (org.springframework.security.core.userdetails.User) SecurityContextHolder.
+                getContext().getAuthentication().getPrincipal();
+        return userRepository.findByUsername(principal.getUsername())
+                .orElseThrow(() -> new UsernameNotFoundException("User name not found - " + principal.getUsername()));
+    }
+
 }

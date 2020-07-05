@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import ssotom.clone.reddit.demo.model.User;
 import ssotom.clone.reddit.demo.repository.UserRepository;
 
-import javax.transaction.Transactional;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -21,7 +20,6 @@ public class UserDetailsServiceImp implements UserDetailsService {
     private final UserRepository userRepository;
 
     @Override
-    @Transactional
     public UserDetails loadUserByUsername(String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User no found with username: " + username));
