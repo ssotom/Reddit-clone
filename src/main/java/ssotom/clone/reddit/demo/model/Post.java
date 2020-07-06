@@ -1,14 +1,17 @@
 package ssotom.clone.reddit.demo.model;
 
 import lombok.Data;
+import lombok.Builder;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
+import ssotom.clone.reddit.demo.dto.response.PostResponse;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import java.time.Instant;
 
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
@@ -21,6 +24,7 @@ public class Post {
     @NotBlank
     private String name;
 
+    @NotBlank
     private String url;
 
     @Lob
@@ -36,4 +40,16 @@ public class Post {
 
     private Instant createdAt;
 
+    public PostResponse mapToDto() {
+        return PostResponse.builder()
+                .id(id)
+                .postName(name)
+                .url(url)
+                .description(description)
+                .username(user.getUsername())
+                .subredditName(subreddit.getName())
+                .voteCount(voteCount)
+                .build();
+    }
+    
 }

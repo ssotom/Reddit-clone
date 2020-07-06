@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
+import ssotom.clone.reddit.demo.dto.SubredditDto;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -36,5 +37,14 @@ public class Subreddit {
     private User user;
 
     private Instant createdAt;
+
+    public SubredditDto mapToDto() {
+        return SubredditDto.builder()
+                .id(id)
+                .name(name)
+                .description(description)
+                .postCount(posts.size())
+                .build();
+    }
 
 }

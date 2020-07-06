@@ -10,11 +10,11 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import ssotom.clone.reddit.demo.exception.NotFoundException;
-import ssotom.clone.reddit.demo.request.LoginRequest;
-import ssotom.clone.reddit.demo.request.SingUpRequest;
-import ssotom.clone.reddit.demo.response.AuthenticationResponse;
-import ssotom.clone.reddit.demo.response.ErrorResponse;
-import ssotom.clone.reddit.demo.response.MessageResponse;
+import ssotom.clone.reddit.demo.dto.request.LoginRequest;
+import ssotom.clone.reddit.demo.dto.request.SingUpRequest;
+import ssotom.clone.reddit.demo.dto.response.AuthenticationResponse;
+import ssotom.clone.reddit.demo.dto.response.ErrorResponse;
+import ssotom.clone.reddit.demo.dto.response.MessageResponse;
 import ssotom.clone.reddit.demo.service.AuthService;
 
 import javax.validation.Valid;

@@ -13,9 +13,9 @@ import ssotom.clone.reddit.demo.model.User;
 import ssotom.clone.reddit.demo.model.VerificationToken;
 import ssotom.clone.reddit.demo.repository.UserRepository;
 import ssotom.clone.reddit.demo.repository.VerificationTokenRepository;
-import ssotom.clone.reddit.demo.request.LoginRequest;
-import ssotom.clone.reddit.demo.request.SingUpRequest;
-import ssotom.clone.reddit.demo.response.AuthenticationResponse;
+import ssotom.clone.reddit.demo.dto.request.LoginRequest;
+import ssotom.clone.reddit.demo.dto.request.SingUpRequest;
+import ssotom.clone.reddit.demo.dto.response.AuthenticationResponse;
 import ssotom.clone.reddit.demo.security.JwtProvider;
 
 import javax.transaction.Transactional;
@@ -70,30 +70,6 @@ public class AuthService {
         fetchUserAndEnable(verificationToken.get());
     }
 
-    private String generateVerificationToken(User user) {
-        String token = UUID.randomUUID().toString();
-
-        VerificationToken verificationToken = new VerificationToken();
-        verificationToken.setToken(token);
-        verificationToken.setUser(user);
-
-        verificationTokenRepository.save(verificationToken);
-        return token;
-    }
-
-    private String generateEmailActivationMessage(String token) {
-        return EMAIL_ACTIVATION_MESSAGE + token;
-    }
-
-    @Transactional
-    private void fetchUserAndEnable(VerificationToken verificationToken) {
-        User user = verificationToken.getUser();
-        user.setEnabled(true);
-        userRepository.save(user);
-
-        verificationTokenRepository.delete(verificationToken);
-    }
-
     public AuthenticationResponse login(LoginRequest loginRequest) {
         Authentication authenticate = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                 loginRequest.getUsername(), loginRequest.getPassword()
@@ -108,6 +84,30 @@ public class AuthService {
                 getContext().getAuthentication().getPrincipal();
         return userRepository.findByUsername(principal.getUsername())
                 .orElseThrow(() -> new UsernameNotFoundException("User name not found - " + principal.getUsername()));
+    }
+
+    @Transactional
+    private void fetchUserAndEnable(VerificationToken verificationToken) {
+        User user = verificationToken.getUser();
+        user.setEnabled(true);
+        userRepository.save(user);
+
+        verificationTokenRepository.delete(verificationToken);
+    }
+
+    private String generateVerificationToken(User user) {
+        String token = UUID.randomUUID().toString();
+
+        VerificationToken verificationToken = new VerificationToken();
+        verificationToken.setToken(token);
+        verificationToken.setUser(user);
+
+        verificationTokenRepository.save(verificationToken);
+        return token;
+    }
+
+    private String generateEmailActivationMessage(String token) {
+        return EMAIL_ACTIVATION_MESSAGE + token;
     }
 
 }

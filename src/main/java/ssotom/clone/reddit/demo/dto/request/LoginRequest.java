@@ -1,4 +1,4 @@
-package ssotom.clone.reddit.demo.request;
+package ssotom.clone.reddit.demo.dto.request;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

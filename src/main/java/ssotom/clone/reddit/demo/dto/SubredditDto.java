@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
+import ssotom.clone.reddit.demo.model.Subreddit;
+import ssotom.clone.reddit.demo.model.User;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -14,7 +16,7 @@ import javax.validation.constraints.NotNull;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class SubredditDTO {
+public class SubredditDto {
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Long id;
@@ -27,5 +29,13 @@ public class SubredditDTO {
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private int postCount;
+
+    public Subreddit mapToEntity(User user) {
+        return Subreddit.builder()
+                .name(name)
+                .description(description)
+                .user(user)
+                .build();
+    }
 
 }
