@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.time.Instant;
 
 @Data
 @NoArgsConstructor
@@ -17,13 +18,19 @@ public class Vote {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotNull
     private VoteType voteType;
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="post_id")
     private Post post;
 
+    @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="user_id")
     private User user;
+
+    private Instant createdAt = Instant.now();
 
 }

@@ -2,12 +2,10 @@ package ssotom.clone.reddit.demo.dto.response;
 
 
 import lombok.Data;
-import lombok.Builder;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class PostResponse {
@@ -20,6 +18,4 @@ public class PostResponse {
     private Integer voteCount;
     private Integer commentCount;
     private String duration;
-    private boolean upVote;
-    private boolean downVote;
 }

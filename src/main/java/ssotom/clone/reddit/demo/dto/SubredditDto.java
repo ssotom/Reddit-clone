@@ -3,7 +3,6 @@ package ssotom.clone.reddit.demo.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.Data;
-import lombok.Builder;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import ssotom.clone.reddit.demo.model.Subreddit;
@@ -14,7 +13,6 @@ import javax.validation.constraints.NotNull;
 import java.util.Collections;
 
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class SubredditDto {
@@ -32,12 +30,12 @@ public class SubredditDto {
     private int postCount;
 
     public Subreddit mapToEntity(User user) {
-        return Subreddit.builder()
-                .name(name)
-                .description(description)
-                .posts(Collections.emptyList())
-                .user(user)
-                .build();
+        Subreddit subreddit = new Subreddit();
+        subreddit.setName(name);
+        subreddit.setDescription(description);
+        subreddit.setPosts(Collections.emptyList());
+        subreddit.setUser(user);
+        return subreddit;
     }
 
 }

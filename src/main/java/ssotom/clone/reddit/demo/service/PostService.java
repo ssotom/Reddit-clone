@@ -13,7 +13,6 @@ import ssotom.clone.reddit.demo.dto.request.PostRequest;
 import ssotom.clone.reddit.demo.dto.response.PostResponse;
 
 import javax.transaction.Transactional;
-import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
 

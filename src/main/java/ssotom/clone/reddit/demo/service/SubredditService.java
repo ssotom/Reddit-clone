@@ -8,7 +8,6 @@ import ssotom.clone.reddit.demo.model.Subreddit;
 import ssotom.clone.reddit.demo.repository.SubredditRepository;
 
 import javax.transaction.Transactional;
-import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
 

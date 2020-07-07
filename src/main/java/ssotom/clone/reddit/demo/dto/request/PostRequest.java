@@ -1,7 +1,6 @@
 package ssotom.clone.reddit.demo.dto.request;
 
 import lombok.Data;
-import lombok.Builder;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import ssotom.clone.reddit.demo.model.Post;
@@ -10,9 +9,9 @@ import ssotom.clone.reddit.demo.model.User;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.util.Collections;
 
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class PostRequest {
@@ -30,13 +29,15 @@ public class PostRequest {
     private String description;
 
     public Post mapToEntity(Subreddit subreddit, User user) {
-        return Post.builder()
-                .name(postName)
-                .description(description)
-                .url(url)
-                .subreddit(subreddit)
-                .user(user)
-                .build();
+        Post post = new Post();
+        post.setName(postName);
+        post.setDescription(description);
+        post.setUrl(url);
+        post.setVoteCount(0);
+        post.setComment(Collections.emptyList());
+        post.setSubreddit(subreddit);
+        post.setUser(user);
+        return post;
     }
 
 }

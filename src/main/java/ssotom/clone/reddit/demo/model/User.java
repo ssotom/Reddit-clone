@@ -1,6 +1,5 @@
 package ssotom.clone.reddit.demo.model;
 
-
 import lombok.Data;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
@@ -36,8 +35,8 @@ public class User {
     @NotBlank
     private String password;
 
-    private Instant createdAt = Instant.now();
-
     private boolean enabled;
+
+    private Instant createdAt = Instant.now();
 
 }

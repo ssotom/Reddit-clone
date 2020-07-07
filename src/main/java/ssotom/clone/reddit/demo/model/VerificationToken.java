@@ -1,6 +1,5 @@
 package ssotom.clone.reddit.demo.model;
 
-
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
@@ -22,8 +21,11 @@ public class VerificationToken {
     private String token;
 
     @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="user_id")
     private User user;
 
     private Instant expiryDate;
+
+    private Instant createdAt = Instant.now();
 
 }

@@ -2,7 +2,6 @@ package ssotom.clone.reddit.demo.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
-import lombok.Builder;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import ssotom.clone.reddit.demo.model.Comment;
@@ -14,7 +13,6 @@ import javax.validation.constraints.NotNull;
 import java.time.Instant;
 
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class CommentDto {
@@ -35,12 +33,12 @@ public class CommentDto {
     private Instant createdAt;
 
     public Comment mapToEntity(Post post, User user) {
-        return Comment.builder()
-                .id(id)
-                .text(text)
-                .post(post)
-                .user(user)
-                .build();
+        Comment comment = new Comment();
+        comment.setId(id);
+        comment.setText(text);
+        comment.setPost(post);
+        comment.setUser(user);
+        return comment;
     }
 
 }

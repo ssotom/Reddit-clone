@@ -19,7 +19,6 @@ import ssotom.clone.reddit.demo.dto.response.AuthenticationResponse;
 import ssotom.clone.reddit.demo.security.JwtProvider;
 
 import javax.transaction.Transactional;
-import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 

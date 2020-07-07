@@ -1,7 +1,7 @@
 package ssotom.clone.reddit.demo.model;
 
+import com.github.marlonlom.utilities.timeago.TimeAgo;
 import lombok.Data;
-import lombok.Builder;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import ssotom.clone.reddit.demo.dto.response.PostResponse;
@@ -9,9 +9,9 @@ import ssotom.clone.reddit.demo.dto.response.PostResponse;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import java.time.Instant;
+import java.util.List;
 
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
@@ -32,24 +32,31 @@ public class Post {
 
     private Integer voteCount;
 
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "post")
+    private List<Comment> comment;
+
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="user_id")
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="subreddit_id")
     private Subreddit subreddit;
 
     private Instant createdAt = Instant.now();
 
     public PostResponse mapToDto() {
-        return PostResponse.builder()
-                .id(id)
-                .postName(name)
-                .url(url)
-                .description(description)
-                .username(user.getUsername())
-                .subredditName(subreddit.getName())
-                .voteCount(voteCount)
-                .build();
+        PostResponse postResponse = new PostResponse();
+        postResponse.setId(id);
+        postResponse.setPostName(name);
+        postResponse.setUrl(url);
+        postResponse.setDescription(description);
+        postResponse.setUsername(user.getUsername());
+        postResponse.setSubredditName(subreddit.getName());
+        postResponse.setVoteCount(voteCount);
+        postResponse.setCommentCount(comment.size());
+        postResponse.setDuration(TimeAgo.using(createdAt.toEpochMilli()));
+        return postResponse;
     }
     
 }
