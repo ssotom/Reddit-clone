@@ -36,7 +36,7 @@ public class User {
     @NotBlank
     private String password;
 
-    private Instant createdAt;
+    private Instant createdAt = Instant.now();
 
     private boolean enabled;
 

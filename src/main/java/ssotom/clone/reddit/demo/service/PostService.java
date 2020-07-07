@@ -36,23 +36,22 @@ public class PostService {
 
     public PostResponse getById(Long id) {
         Post post = postRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException(id.toString()));
+                .orElseThrow(() -> new NotFoundException("Post not found with id: " + id));
         return post.mapToDto();
     }
 
     @Transactional
-    public void save(PostRequest postRequest) {
+    public PostResponse save(PostRequest postRequest) {
         Subreddit subreddit = subredditRepository.findByName(postRequest.getSubredditName())
-                .orElseThrow(() -> new NotFoundException(postRequest.getSubredditName()));
+                .orElseThrow(() -> new NotFoundException("Subreddit not found with name: " + postRequest.getSubredditName()));
         Post post = postRequest.mapToEntity(subreddit, authService.getCurrentUser());
-        post.setCreatedAt(Instant.now());
 
-        postRepository.save(post);
+        return postRepository.save(post).mapToDto();
     }
 
     public List<PostResponse> getBySubreddit(Long id) {
         Subreddit subreddit = subredditRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException(id.toString()));
+                .orElseThrow(() -> new NotFoundException("Subreddit not found with id: " + id));
 
         return postRepository.findAllBySubreddit(subreddit)
                 .stream()
@@ -62,7 +61,7 @@ public class PostService {
 
     public List<PostResponse> getByUsername(String username) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new NotFoundException(username));
+                .orElseThrow(() -> new NotFoundException("User no found with username: " + username));
 
         return postRepository.findByUser(user)
                 .stream()

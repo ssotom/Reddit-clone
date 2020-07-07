@@ -23,7 +23,7 @@ public class PostRequest {
     @NotBlank
     private String postName;
 
-    @NotNull
+    @NotBlank
     private String url;
 
     @NotNull

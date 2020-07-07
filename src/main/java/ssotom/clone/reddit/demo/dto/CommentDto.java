@@ -1,41 +1,44 @@
 package ssotom.clone.reddit.demo.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import lombok.Data;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
-import ssotom.clone.reddit.demo.model.Subreddit;
+import ssotom.clone.reddit.demo.model.Comment;
+import ssotom.clone.reddit.demo.model.Post;
 import ssotom.clone.reddit.demo.model.User;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.util.Collections;
+import java.time.Instant;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class SubredditDto {
+public class CommentDto {
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Long id;
 
-    @NotBlank
-    private String name;
+    @NotNull
+    private Long postId;
 
     @NotNull
-    private String description;
+    private String text;
+
+    @NotBlank
+    private String username;
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private int postCount;
+    private Instant createdAt;
 
-    public Subreddit mapToEntity(User user) {
-        return Subreddit.builder()
-                .name(name)
-                .description(description)
-                .posts(Collections.emptyList())
+    public Comment mapToEntity(Post post, User user) {
+        return Comment.builder()
+                .id(id)
+                .text(text)
+                .post(post)
                 .user(user)
                 .build();
     }

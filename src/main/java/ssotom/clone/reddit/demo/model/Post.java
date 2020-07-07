@@ -38,7 +38,7 @@ public class Post {
     @ManyToOne(fetch = FetchType.LAZY)
     private Subreddit subreddit;
 
-    private Instant createdAt;
+    private Instant createdAt = Instant.now();
 
     public PostResponse mapToDto() {
         return PostResponse.builder()

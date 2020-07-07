@@ -27,7 +27,7 @@ import java.util.UUID;
 @Service
 public class AuthService {
 
-    private final static String EMAIL_ACTIVATION_URL = "http://localhost:8080/api/auth/account_verification";
+    private final static String EMAIL_ACTIVATION_URL = "http://localhost:8080/api/auth/account-verification";
     private final static String EMAIL_ACTIVATION_SUBJECT = "Please Activate your account";
     private final static String EMAIL_ACTIVATION_MESSAGE = "Thank you for signing up to Spring Reddit Clone, " +
             "please click on the below url to activate your account : " + EMAIL_ACTIVATION_URL + "/";
@@ -54,7 +54,6 @@ public class AuthService {
                 .username(singUpRequest.getUsername())
                 .email(singUpRequest.getEmail())
                 .password(passwordEncoder.encode(singUpRequest.getPassword()))
-                .createdAt(Instant.now())
                 .enabled(false)
                 .build();
         userRepository.save(user);
@@ -76,14 +75,14 @@ public class AuthService {
         ));
         SecurityContextHolder.getContext().setAuthentication(authenticate);
         String token = jwtProvider.generateToken(authenticate);
-        return new AuthenticationResponse(token, loginRequest.getUsername());
+        return new AuthenticationResponse(token, "Bearer", loginRequest.getUsername());
     }
 
     public User getCurrentUser() {
         org.springframework.security.core.userdetails.User principal = (org.springframework.security.core.userdetails.User) SecurityContextHolder.
                 getContext().getAuthentication().getPrincipal();
         return userRepository.findByUsername(principal.getUsername())
-                .orElseThrow(() -> new UsernameNotFoundException("User name not found - " + principal.getUsername()));
+                .orElseThrow(() -> new UsernameNotFoundException("User no found with username: " + principal.getUsername()));
     }
 
     @Transactional

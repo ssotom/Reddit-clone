@@ -21,7 +21,7 @@ public class SubredditService {
 
     public SubredditDto getByd(Long id) {
         Subreddit subreddit = subredditRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Subreddit not found with id -" + id));
+                .orElseThrow(() -> new NotFoundException("Subreddit not found with id: " + id));
         return subreddit.mapToDto();
     }
 
@@ -36,10 +36,8 @@ public class SubredditService {
     public SubredditDto save(SubredditDto subredditDto) {
         Subreddit subreddit = subredditDto.mapToEntity(authService.getCurrentUser());
         subreddit.setName("/r/" + subreddit.getName());
-        subreddit.setCreatedAt(Instant.now());
 
-        Subreddit createdSubreddit = subredditRepository.save(subreddit);
-        return createdSubreddit.mapToDto();
+       return subredditRepository.save(subreddit).mapToDto();
     }
 
 }

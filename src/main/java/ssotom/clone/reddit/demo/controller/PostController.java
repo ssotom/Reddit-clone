@@ -17,7 +17,7 @@ import java.util.List;
 
 @AllArgsConstructor
 @RestController
-@RequestMapping("/api/post/")
+@RequestMapping("/api/post")
 public class PostController {
 
     private final PostService postService;
@@ -42,21 +42,31 @@ public class PostController {
             return ErrorResponse.returnError(result);
         }
         try {
-            postService.save(postRequest);
-            return new ResponseEntity<>(HttpStatus.CREATED);
+            PostResponse post = postService.save(postRequest);
+            return new ResponseEntity<>(post, HttpStatus.CREATED);
+        } catch (NotFoundException e) {
+            return ErrorResponse.returnError(e.getMessage(), HttpStatus.NOT_FOUND);
         } catch (DataAccessException e) {
             return ErrorResponse.returnError(e.getMostSpecificCause().getLocalizedMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @GetMapping("by-subreddit/{id}")
+    @GetMapping("/by-subreddit/{id}")
     public ResponseEntity<?> getBySubreddit(Long id) {
-        return new ResponseEntity<>(postService.getBySubreddit(id), HttpStatus.OK);
+        try {
+            return new ResponseEntity<>(postService.getBySubreddit(id), HttpStatus.OK);
+        } catch (NotFoundException e) {
+            return ErrorResponse.returnError(e.getMessage(), HttpStatus.NOT_FOUND);
+        }
     }
 
-    @GetMapping("by-user/{username}")
+    @GetMapping("/by-user/{username}")
     public ResponseEntity<?> getPostsByUsername(String username) {
-        return new ResponseEntity<>(postService.getByUsername(username), HttpStatus.OK);
+        try {
+            return new ResponseEntity<>(postService.getByUsername(username), HttpStatus.OK);
+        } catch (NotFoundException e) {
+            return ErrorResponse.returnError(e.getMessage(), HttpStatus.NOT_FOUND);
+        }
     }
 
 }
