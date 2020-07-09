@@ -1,12 +1,18 @@
 package ssotom.clone.reddit.demo.dto.response;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Builder;
+import lombok.AllArgsConstructor;
+
+import java.time.Instant;
 
 @Data
+@Builder
 @AllArgsConstructor
 public class AuthenticationResponse {
-    private String token;
     private String type;
+    private String token;
+    private String refreshToken;
     private String username;
+    private Instant expiresAt;
 }

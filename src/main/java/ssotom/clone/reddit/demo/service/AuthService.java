@@ -8,7 +8,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import ssotom.clone.reddit.demo.dto.request.RefreshTokenRequest;
 import ssotom.clone.reddit.demo.exception.NotFoundException;
+import ssotom.clone.reddit.demo.model.RefreshToken;
 import ssotom.clone.reddit.demo.model.User;
 import ssotom.clone.reddit.demo.model.VerificationToken;
 import ssotom.clone.reddit.demo.repository.UserRepository;
@@ -19,6 +21,7 @@ import ssotom.clone.reddit.demo.dto.response.AuthenticationResponse;
 import ssotom.clone.reddit.demo.security.JwtProvider;
 
 import javax.transaction.Transactional;
+import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -37,6 +40,7 @@ public class AuthService {
     private final MailService mailService;
     private final AuthenticationManager authenticationManager;
     private final JwtProvider jwtProvider;
+    private final RefreshTokenService refreshTokenService;
 
     public boolean existsByEmail(String email) {
         return userRepository.existsByEmail(email);
@@ -74,7 +78,13 @@ public class AuthService {
         ));
         SecurityContextHolder.getContext().setAuthentication(authenticate);
         String token = jwtProvider.generateToken(authenticate);
-        return new AuthenticationResponse(token, "Bearer", loginRequest.getUsername());
+        return  AuthenticationResponse.builder()
+                .type("Bearer")
+                .token(token)
+                .refreshToken(refreshTokenService.generateRefreshToken(getCurrentUser()).getToken())
+                .expiresAt(Instant.now().plusMillis(jwtProvider.getJwtExpirationInMillis()))
+                .username(loginRequest.getUsername())
+                .build();
     }
 
     public User getCurrentUser() {
@@ -82,6 +92,18 @@ public class AuthService {
                 getContext().getAuthentication().getPrincipal();
         return userRepository.findByUsername(principal.getUsername())
                 .orElseThrow(() -> new UsernameNotFoundException("User no found with username: " + principal.getUsername()));
+    }
+
+    public AuthenticationResponse refreshToken(RefreshTokenRequest refreshTokenRequest) {
+        RefreshToken refreshToken = refreshTokenService.validateRefreshToken(refreshTokenRequest.getRefreshToken());
+        String token = jwtProvider.generateTokenWithUserName(refreshToken.getUser().getUsername());
+        return AuthenticationResponse.builder()
+                .type("Bearer")
+                .token(token)
+                .refreshToken(refreshTokenRequest.getRefreshToken())
+                .expiresAt(Instant.now().plusMillis(jwtProvider.getJwtExpirationInMillis()))
+                .username(refreshToken.getUser().getUsername())
+                .build();
     }
 
     @Transactional

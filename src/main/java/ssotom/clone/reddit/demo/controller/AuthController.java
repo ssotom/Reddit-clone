@@ -9,13 +9,16 @@ import org.springframework.security.authentication.DisabledException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
+import ssotom.clone.reddit.demo.dto.request.RefreshTokenRequest;
 import ssotom.clone.reddit.demo.exception.NotFoundException;
 import ssotom.clone.reddit.demo.dto.request.LoginRequest;
 import ssotom.clone.reddit.demo.dto.request.SingUpRequest;
 import ssotom.clone.reddit.demo.dto.response.AuthenticationResponse;
 import ssotom.clone.reddit.demo.dto.response.ErrorResponse;
 import ssotom.clone.reddit.demo.dto.response.MessageResponse;
+import ssotom.clone.reddit.demo.exception.SpringRedditException;
 import ssotom.clone.reddit.demo.service.AuthService;
+import ssotom.clone.reddit.demo.service.RefreshTokenService;
 
 import javax.validation.Valid;
 
@@ -25,6 +28,7 @@ import javax.validation.Valid;
 public class AuthController {
 
     private final AuthService authService;
+    private final RefreshTokenService refreshTokenService;
 
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@Valid @RequestBody SingUpRequest singUpRequest, BindingResult result) {
@@ -63,6 +67,27 @@ public class AuthController {
         } catch (NotFoundException e) {
             return ErrorResponse.returnError(e.getMessage(), HttpStatus.NOT_FOUND);
         }
+    }
+
+    @PostMapping("refresh-token")
+    public ResponseEntity<?> refreshToken(@Valid @RequestBody RefreshTokenRequest refreshTokenRequest, BindingResult result) {
+        if(result.hasErrors()) {
+            return ErrorResponse.returnError(result);
+        }
+        try {
+            return new ResponseEntity<>(authService.refreshToken(refreshTokenRequest), HttpStatus.OK);
+        } catch (SpringRedditException e) {
+            return ErrorResponse.returnError(e.getMessage(), HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(@Valid @RequestBody RefreshTokenRequest refreshTokenRequest, BindingResult result) {
+        if(result.hasErrors()) {
+            return ErrorResponse.returnError(result);
+        }
+        refreshTokenService.deleteRefreshToken(refreshTokenRequest.getRefreshToken());
+        return new ResponseEntity<>(new MessageResponse("Refresh Token Deleted Successfully!"), HttpStatus.OK);
     }
 
     private void validateRegisterRequest(SingUpRequest singUpRequest, BindingResult result) {

@@ -6,6 +6,8 @@ import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.SignatureException;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.security.core.userdetails.User;
@@ -23,7 +25,9 @@ import java.util.Date;
 public class JwtProvider {
 
     private KeyStore keyStore;
-    private final static int JWT_EXPIRATION = 86400; //Seconds
+
+    @Value("${jwt.expiration.time}") //Seconds
+    private long JWT_EXPIRATION;
 
     @PostConstruct
     public void init() {
@@ -41,7 +45,16 @@ public class JwtProvider {
         return Jwts.builder()
                 .setSubject(principal.getUsername())
                 .setIssuedAt(new Date())
-                .setExpiration(new Date((new Date()).getTime() + JWT_EXPIRATION * 1000))
+                .setExpiration(new Date((new Date()).getTime() + JWT_EXPIRATION))
+                .signWith(getPrivateKey())
+                .compact();
+    }
+
+    public String generateTokenWithUserName(String username) {
+        return Jwts.builder()
+                .setSubject(username)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date((new Date()).getTime() + JWT_EXPIRATION))
                 .signWith(getPrivateKey())
                 .compact();
     }
@@ -75,6 +88,10 @@ public class JwtProvider {
                 .parseClaimsJws(token)
                 .getBody()
                 .getSubject();
+    }
+
+    public long getJwtExpirationInMillis() {
+        return JWT_EXPIRATION;
     }
 
     private PrivateKey getPrivateKey() {
