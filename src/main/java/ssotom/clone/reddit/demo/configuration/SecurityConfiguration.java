@@ -38,7 +38,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         // httpSecurity.headers().frameOptions().disable();
         // httpSecurity.authorizeRequests().antMatchers("/h2-console/**").permitAll();
 
-        httpSecurity.csrf().disable()
+        httpSecurity.cors().and()
+                .csrf().disable()
                 .authorizeRequests()
                 .antMatchers("/api/auth/**").permitAll()
                 .antMatchers(HttpMethod.GET, "/api/subreddit").permitAll()

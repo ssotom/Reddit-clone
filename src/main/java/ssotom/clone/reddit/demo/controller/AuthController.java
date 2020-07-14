@@ -69,7 +69,7 @@ public class AuthController {
         }
     }
 
-    @PostMapping("refresh-token")
+    @PostMapping("/refresh-token")
     public ResponseEntity<?> refreshToken(@Valid @RequestBody RefreshTokenRequest refreshTokenRequest, BindingResult result) {
         if(result.hasErrors()) {
             return ErrorResponse.returnError(result);
