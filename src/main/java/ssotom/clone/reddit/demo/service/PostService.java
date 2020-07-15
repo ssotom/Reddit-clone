@@ -41,8 +41,8 @@ public class PostService {
 
     @Transactional
     public PostResponse save(PostRequest postRequest) {
-        Subreddit subreddit = subredditRepository.findByName(postRequest.getSubredditName())
-                .orElseThrow(() -> new NotFoundException("Subreddit not found with name: " + postRequest.getSubredditName()));
+        Subreddit subreddit = subredditRepository.findById(postRequest.getSubredditId())
+                .orElseThrow(() -> new NotFoundException("Subreddit not found with id: " + postRequest.getSubredditId()));
         Post post = postRequest.mapToEntity(subreddit, authService.getCurrentUser());
 
         return postRepository.save(post).mapToDto();

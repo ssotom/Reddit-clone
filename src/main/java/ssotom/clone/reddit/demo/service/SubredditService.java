@@ -34,7 +34,7 @@ public class SubredditService {
     @Transactional
     public SubredditDto save(SubredditDto subredditDto) {
         Subreddit subreddit = subredditDto.mapToEntity(authService.getCurrentUser());
-        subreddit.setName("/r/" + subreddit.getName());
+        subreddit.setName("r/" + subreddit.getName());
 
        return subredditRepository.save(subreddit).mapToDto();
     }

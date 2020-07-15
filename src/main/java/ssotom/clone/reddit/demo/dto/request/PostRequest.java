@@ -16,11 +16,11 @@ import java.util.Collections;
 @AllArgsConstructor
 public class PostRequest {
 
-    @NotBlank
-    private String subredditName;
+    @NotNull
+    private Long subredditId;
 
     @NotBlank
-    private String postName;
+    private String name;
 
     @NotBlank
     private String url;
@@ -30,7 +30,7 @@ public class PostRequest {
 
     public Post mapToEntity(Subreddit subreddit, User user) {
         Post post = new Post();
-        post.setName(postName);
+        post.setName(name);
         post.setDescription(description);
         post.setUrl(url);
         post.setVoteCount(0);
