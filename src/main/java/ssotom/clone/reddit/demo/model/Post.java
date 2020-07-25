@@ -45,6 +45,18 @@ public class Post {
 
     private Instant createdAt = Instant.now();
 
+    public void setVoteCount(int voteCount) {
+        this.voteCount = voteCount;
+    }
+
+    public void setVoteCount(VoteType voteType) {
+        if (VoteType.UPVOTE.equals(voteType)) {
+            voteCount++;
+        } else {
+            voteCount--;
+        }
+    }
+
     public PostResponse mapToDto() {
         PostResponse postResponse = new PostResponse();
         postResponse.setId(id);
@@ -58,5 +70,5 @@ public class Post {
         postResponse.setDuration(TimeAgo.using(createdAt.toEpochMilli()));
         return postResponse;
     }
-    
+
 }

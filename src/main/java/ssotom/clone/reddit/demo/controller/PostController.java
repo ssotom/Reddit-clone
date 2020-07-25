@@ -61,7 +61,7 @@ public class PostController {
     }
 
     @GetMapping("/by-user/{username}")
-    public ResponseEntity<?> getPostsByUsername(String username) {
+    public ResponseEntity<?> getPostsByUsername(@PathVariable String username) {
         try {
             return new ResponseEntity<>(postService.getByUsername(username), HttpStatus.OK);
         } catch (NotFoundException e) {

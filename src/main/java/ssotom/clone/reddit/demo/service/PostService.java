@@ -11,6 +11,7 @@ import ssotom.clone.reddit.demo.repository.SubredditRepository;
 import ssotom.clone.reddit.demo.repository.UserRepository;
 import ssotom.clone.reddit.demo.dto.request.PostRequest;
 import ssotom.clone.reddit.demo.dto.response.PostResponse;
+import ssotom.clone.reddit.demo.repository.VoteRepository;
 
 import javax.transaction.Transactional;
 import java.util.List;
@@ -23,20 +24,21 @@ public class PostService {
     private final PostRepository postRepository;
     private final SubredditRepository subredditRepository;
     private final UserRepository userRepository;
+    private  final VoteRepository voteRepository;
     private final AuthService authService;
 
 
     public List<PostResponse> getAll() {
         return postRepository.findAll()
                 .stream()
-                .map(Post::mapToDto)
+                .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
 
     public PostResponse getById(Long id) {
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Post not found with id: " + id));
-        return post.mapToDto();
+        return mapToResponse(post);
     }
 
     @Transactional
@@ -45,7 +47,7 @@ public class PostService {
                 .orElseThrow(() -> new NotFoundException("Subreddit not found with id: " + postRequest.getSubredditId()));
         Post post = postRequest.mapToEntity(subreddit, authService.getCurrentUser());
 
-        return postRepository.save(post).mapToDto();
+        return mapToResponse(postRepository.save(post));
     }
 
     public List<PostResponse> getBySubreddit(Long id) {
@@ -54,7 +56,7 @@ public class PostService {
 
         return postRepository.findAllBySubreddit(subreddit)
                 .stream()
-                .map(Post::mapToDto)
+                .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
 
@@ -64,8 +66,21 @@ public class PostService {
 
         return postRepository.findByUser(user)
                 .stream()
-                .map(Post::mapToDto)
+                .map(this::mapToResponse)
                 .collect(Collectors.toList());
+    }
+
+    private PostResponse mapToResponse(Post post) {
+        PostResponse postResponse = post.mapToDto();
+        if (authService.isLoggedIn()) {
+            voteRepository.findTopByPostAndUserOrderByIdDesc(post, authService.getCurrentUser())
+                    .ifPresent(vote -> {
+                        postResponse.setUpVote(vote);
+                        postResponse.setDownVote(vote);
+                    });
+        }
+
+        return postResponse;
     }
 
 }

@@ -32,15 +32,15 @@ public class VoteService {
         Optional<Vote> voteByPostAndUser = voteRepository
                 .findTopByPostAndUserOrderByIdDesc(post, user);
 
-        if (voteByPostAndUser.isPresent()
-                && voteByPostAndUser.get().getVoteType().equals(voteRequest.getVoteType())) {
-            throw new SpringRedditException("You have already " + voteRequest.getVoteType() + "'d for this post");
+        if (voteByPostAndUser.isPresent()) {
+            if (voteByPostAndUser.get().getVoteType().equals(voteRequest.getVoteType())) {
+                throw new SpringRedditException("You have already " + voteRequest.getVoteType() + "'d for this post");
+            } else {
+                post.setVoteCount(voteByPostAndUser.get().getVoteType().getInverse());
+                voteRepository.delete(voteByPostAndUser.get());
+            }
         }
-        if (VoteType.UPVOTE.equals(voteRequest.getVoteType())) {
-            post.setVoteCount(post.getVoteCount() + 1);
-        } else {
-            post.setVoteCount(post.getVoteCount() - 1);
-        }
+        post.setVoteCount(voteRequest.getVoteType());
         voteRepository.save(voteRequest.mapToEntity(post, user));
         postRepository.save(post);
     }

@@ -1,5 +1,6 @@
 package ssotom.clone.reddit.demo.model;
 
+import com.github.marlonlom.utilities.timeago.TimeAgo;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
@@ -38,7 +39,7 @@ public class Comment {
         commentDto.setPostId(post.getId());
         commentDto.setText(text);
         commentDto.setUsername(user.getUsername());
-        commentDto.setCreatedAt(createdAt);
+        commentDto.setDuration(TimeAgo.using(createdAt.toEpochMilli()));
         return commentDto;
     }
 

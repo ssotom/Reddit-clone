@@ -30,7 +30,7 @@ public class CommentDto {
     private String username;
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private Instant createdAt;
+    private String duration;
 
     public Comment mapToEntity(Post post, User user) {
         Comment comment = new Comment();
