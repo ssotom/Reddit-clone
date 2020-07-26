@@ -1,6 +1,7 @@
 package ssotom.clone.reddit.demo.service;
 
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -9,6 +10,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import ssotom.clone.reddit.demo.configuration.AppConfiguration;
 import ssotom.clone.reddit.demo.dto.request.RefreshTokenRequest;
 import ssotom.clone.reddit.demo.exception.NotFoundException;
 import ssotom.clone.reddit.demo.model.RefreshToken;
@@ -35,6 +37,8 @@ public class AuthService {
     private final static String EMAIL_ACTIVATION_MESSAGE = "Thank you for signing up to Spring Reddit Clone, " +
             "please click on the below url to activate your account : " + EMAIL_ACTIVATION_URL + "/";
 
+    private final AppConfiguration appConfiguration;
+
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final VerificationTokenRepository verificationTokenRepository;
@@ -58,7 +62,8 @@ public class AuthService {
                 .username(singUpRequest.getUsername())
                 .email(singUpRequest.getEmail())
                 .password(passwordEncoder.encode(singUpRequest.getPassword()))
-                .enabled(false)
+                .enabled(!appConfiguration.isEmailVerificationRequired())
+                .createdAt(Instant.now())
                 .build();
         userRepository.save(user);
 

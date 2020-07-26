@@ -7,10 +7,11 @@ import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.SignatureException;
 import lombok.extern.slf4j.Slf4j;
 
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.security.core.userdetails.User;
+import ssotom.clone.reddit.demo.configuration.AppConfiguration;
 import ssotom.clone.reddit.demo.exception.SpringRedditException;
 
 import javax.annotation.PostConstruct;
@@ -26,8 +27,8 @@ public class JwtProvider {
 
     private KeyStore keyStore;
 
-    @Value("${jwt.expiration.time}") //Seconds
-    private long JWT_EXPIRATION;
+    @Autowired
+    private AppConfiguration appConfiguration;
 
     @PostConstruct
     public void init() {
@@ -45,7 +46,7 @@ public class JwtProvider {
         return Jwts.builder()
                 .setSubject(principal.getUsername())
                 .setIssuedAt(new Date())
-                .setExpiration(new Date((new Date()).getTime() + JWT_EXPIRATION))
+                .setExpiration(new Date((new Date()).getTime() + getJwtExpirationInMillis()))
                 .signWith(getPrivateKey())
                 .compact();
     }
@@ -54,7 +55,7 @@ public class JwtProvider {
         return Jwts.builder()
                 .setSubject(username)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date((new Date()).getTime() + JWT_EXPIRATION))
+                .setExpiration(new Date((new Date()).getTime() + getJwtExpirationInMillis()))
                 .signWith(getPrivateKey())
                 .compact();
     }
@@ -91,7 +92,7 @@ public class JwtProvider {
     }
 
     public long getJwtExpirationInMillis() {
-        return JWT_EXPIRATION;
+        return appConfiguration.getJwtExpirationTime();
     }
 
     private PrivateKey getPrivateKey() {

@@ -7,7 +7,6 @@ import lombok.AllArgsConstructor;
 import ssotom.clone.reddit.demo.model.Vote;
 import ssotom.clone.reddit.demo.model.VoteType;
 
-import java.util.Optional;
 
 @Data
 @NoArgsConstructor
