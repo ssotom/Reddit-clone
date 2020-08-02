@@ -17,7 +17,6 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name="users")
 public class User {
 
     @Id
