@@ -38,7 +38,8 @@ public class AuthController {
         }
         try {
             authService.signup(singUpRequest);
-            return new ResponseEntity<>(new MessageResponse("Account created successfully"), HttpStatus.CREATED);
+            return new ResponseEntity<>(new MessageResponse("Account created successfully, " +
+                    "please check your inbox to validated your E-mail address"), HttpStatus.CREATED);
         } catch (DataAccessException e) {
             return ErrorResponse.returnError(e.getMostSpecificCause().getLocalizedMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -63,7 +64,7 @@ public class AuthController {
     public ResponseEntity<?> verifyAccount(@PathVariable String token) {
         try {
             authService.verifyAccount(token);
-            return new ResponseEntity<>(new MessageResponse("Account activated successfully"), HttpStatus.OK);
+            return new ResponseEntity<>(new MessageResponse("Account activated successfully, now you can Log In"), HttpStatus.OK);
         } catch (NotFoundException e) {
             return ErrorResponse.returnError(e.getMessage(), HttpStatus.NOT_FOUND);
         }

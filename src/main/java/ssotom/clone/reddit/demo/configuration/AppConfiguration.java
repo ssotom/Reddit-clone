@@ -13,5 +13,6 @@ public class AppConfiguration {
 
     private long jwtExpirationTime = 43200000;
     private boolean emailVerificationRequired = false;
+    private String emailVerificationUrl = "";
 
 }

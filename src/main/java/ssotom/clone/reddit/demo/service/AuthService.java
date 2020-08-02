@@ -1,7 +1,6 @@
 package ssotom.clone.reddit.demo.service;
 
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -32,11 +31,6 @@ import java.util.UUID;
 @Service
 public class AuthService {
 
-    private final static String EMAIL_ACTIVATION_URL = "http://localhost:8080/api/auth/account-verification";
-    private final static String EMAIL_ACTIVATION_SUBJECT = "Please Activate your account";
-    private final static String EMAIL_ACTIVATION_MESSAGE = "Thank you for signing up to Spring Reddit Clone, " +
-            "please click on the below url to activate your account : " + EMAIL_ACTIVATION_URL + "/";
-
     private final AppConfiguration appConfiguration;
 
     private final UserRepository userRepository;
@@ -57,7 +51,6 @@ public class AuthService {
 
     @Transactional
     public void signup(SingUpRequest singUpRequest) {
-
         User user = User.builder()
                 .username(singUpRequest.getUsername())
                 .email(singUpRequest.getEmail())
@@ -68,8 +61,8 @@ public class AuthService {
         userRepository.save(user);
 
         String token = generateVerificationToken(user);
-        String message =  generateEmailActivationMessage(token);
-        mailService.sendMail(user.getEmail(), EMAIL_ACTIVATION_SUBJECT, message);
+        String message =  getEmailActivationMessage(token);
+        mailService.sendMail(user.getEmail(), "Please activate your account", message);
     }
 
     public void verifyAccount(String token) {
@@ -137,8 +130,9 @@ public class AuthService {
         return token;
     }
 
-    private String generateEmailActivationMessage(String token) {
-        return EMAIL_ACTIVATION_MESSAGE + token;
+    private String getEmailActivationMessage(String token) {
+        return "Thank you for signing up to Spring Reddit Clone, please click " +
+                "on the below url to activate your account : " + appConfiguration.getEmailVerificationUrl() + "/" + token;
     }
 
 }
