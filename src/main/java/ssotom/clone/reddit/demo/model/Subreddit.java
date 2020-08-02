@@ -28,9 +28,6 @@ public class Subreddit {
     @NotNull
     private String description;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "subreddit")
-    private List<Post> posts;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="user_id")
     private User user;
@@ -42,7 +39,6 @@ public class Subreddit {
         subredditDto.setId(id);
         subredditDto.setName(name);
         subredditDto.setDescription(description);
-        subredditDto.setPostCount(posts.size());
         return subredditDto;
     }
 

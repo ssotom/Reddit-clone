@@ -26,14 +26,10 @@ public class SubredditDto {
     @NotNull
     private String description;
 
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private int postCount;
-
     public Subreddit mapToEntity(User user) {
         Subreddit subreddit = new Subreddit();
         subreddit.setName(name);
         subreddit.setDescription(description);
-        subreddit.setPosts(Collections.emptyList());
         subreddit.setUser(user);
         return subreddit;
     }

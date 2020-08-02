@@ -28,6 +28,7 @@ public class PostService {
     private final AuthService authService;
 
 
+    @Transactional
     public List<PostResponse> getAll() {
         return postRepository.findAll()
                 .stream()
