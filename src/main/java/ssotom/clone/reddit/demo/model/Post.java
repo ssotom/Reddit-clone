@@ -15,6 +15,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@Table(name="posts")
 public class Post {
 
     @Id
@@ -32,7 +33,7 @@ public class Post {
 
     private Integer voteCount;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "post")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "posts")
     private List<Comment> comment;
 
     @ManyToOne(fetch = FetchType.LAZY)
