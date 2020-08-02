@@ -33,7 +33,7 @@ public class Post {
 
     private Integer voteCount;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "posts")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "post")
     private List<Comment> comment;
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -28,7 +28,7 @@ public class Subreddit {
     @NotNull
     private String description;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "subreddits")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "subreddit")
     private List<Post> posts;
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -12,7 +12,7 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name="Votes")
+@Table(name="votes")
 public class Vote {
 
     @Id
