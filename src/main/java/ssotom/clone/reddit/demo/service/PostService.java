@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @AllArgsConstructor
+@Transactional
 @Service
 public class PostService {
 
@@ -27,8 +28,6 @@ public class PostService {
     private  final VoteRepository voteRepository;
     private final AuthService authService;
 
-
-    @Transactional
     public List<PostResponse> getAll() {
         return postRepository.findAll()
                 .stream()
@@ -42,7 +41,6 @@ public class PostService {
         return mapToResponse(post);
     }
 
-    @Transactional
     public PostResponse save(PostRequest postRequest) {
         Subreddit subreddit = subredditRepository.findById(postRequest.getSubredditId())
                 .orElseThrow(() -> new NotFoundException("Subreddit not found with id: " + postRequest.getSubredditId()));

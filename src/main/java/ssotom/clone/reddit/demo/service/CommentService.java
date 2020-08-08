@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 
 
 @AllArgsConstructor
+@Transactional
 @Service
 public class CommentService {
 
@@ -43,7 +44,6 @@ public class CommentService {
                 .collect(Collectors.toList());
     }
 
-    @Transactional
     public CommentDto save(CommentDto commentDto) {
         Post post = postRepository.findById(commentDto.getPostId())
                 .orElseThrow(() -> new NotFoundException("Post not found with id: " + commentDto.getPostId()));
